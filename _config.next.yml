@@ -103,7 +103,7 @@ motion:
   enable: true
 
 creative_commons:
-  license: by-nc-sa
+  license: by
   sidebar: false
   post: true
   language: deed.zh
