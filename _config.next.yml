@@ -108,7 +108,14 @@ creative_commons:
   post: true
   language: deed.zh
 
-# 评论系统（需要时在此配置，例如 gitalk / waline / utterances）
+# 评论系统：Utterances（基于 GitHub Issues，无需任何密钥）
 comments:
   style: tabs
-  active: ''
+  active: utterances
+
+# Utterances —— 评论存进 X-CODER-ocs/blog 仓库的 Issues
+utterances:
+  enable: true
+  repo: X-CODER-ocs/blog
+  issue_term: pathname        # 用文章路径作为 issue 标识
+  theme: github-light         # 浅色，与 #4AA26F 主题搭配
