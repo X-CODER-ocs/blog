@@ -20,9 +20,10 @@ favicon:
   apple_touch_icon: /images/apple-touch-icon.png
   safari_pinned_tab: /images/favicon.svg
 
-# 自定义样式（深色下统一封面底色）
+# 自定义样式与脚本（MD3 皮肤）
 custom_file_path:
   style: source/_data/styles.styl
+  bodyEnd: source/_data/body-end.njk
 
 # ---------------------------------------------------------------- Menu
 menu:
