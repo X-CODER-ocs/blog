@@ -6,6 +6,11 @@
 # 外观方案: Muse | Mist | Pisces | Gemini
 scheme: Gemini
 
+# 主题主色（链接、选中态、侧栏高亮、顶部条等）
+theme_color:
+  light: "#4AA26F"
+  dark: "#4AA26F"
+
 # 暗黑模式: 跟随系统 / 可手动切换
 darkmode: true
 
