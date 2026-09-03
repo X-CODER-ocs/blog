@@ -4,9 +4,10 @@ date: 2026-09-03 20:00:00
 tags:
   - Hexo
   - 建站
+  - GitHub Action
 categories:
   - 随笔
-description: 'X-CODER 官方博客正式上线，记录 OCS 团队的开发与工程实践。'
+description: '我的博客上线啦!(实际上我以前也有,可以说是更新了awa!)'
 sticky: 1
 ---
 

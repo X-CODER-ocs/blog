@@ -10,9 +10,9 @@ scheme: Gemini
 darkmode: true
 
 favicon:
-  small: /images/favicon-16x16.svg
-  medium: /images/favicon-32x32.svg
-  apple_touch_icon: /images/apple-touch-icon.svg
+  small: /images/favicon-16x16.png
+  medium: /images/favicon-32x32.png
+  apple_touch_icon: /images/apple-touch-icon.png
   safari_pinned_tab: /images/favicon.svg
 
 # 自定义样式（深色下统一封面底色）
@@ -38,7 +38,7 @@ sidebar:
   offset: 12
 
 avatar:
-  url: /images/avatar.svg
+  url: /images/avatar.png
   rounded: true
   rotated: true
 

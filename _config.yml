@@ -4,10 +4,10 @@
 
 # Site
 title: X-CODER
-subtitle: 'OCS 团队技术博客'
-description: 'X-CODER / OCS 团队的技术博客，记录开发、架构与工程实践'
-keywords: OCS, X-CODER, 技术, 博客
-author: X-CODER Team
+subtitle: '仓颉的博客!'
+description: 'X-CODER 的技术博客，分享编程、开发、开源等相关内容。'
+keywords: X-CODER, 技术, 博客
+author: X-CODER
 language: zh-CN
 timezone: Asia/Shanghai
 
