@@ -463,3 +463,37 @@ mark.search-keyword {
     color: #5fb893 !important;
   }
 }
+
+/* ---------- 11. 导航栏：MD3 Expressive 半透明质感（translucent surface + shape） ---------- */
+
+/* 顶部品牌栏：主色半透明 + 毛玻璃 + 底部大圆角（MD3 Expressive 的 shape 表达） */
+.site-brand-container {
+  background: rgba(74, 162, 111, .78) !important;
+  backdrop-filter: blur(20px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+  border-radius: 0 0 var(--md-radius-lg) var(--md-radius-lg) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, .18) !important;
+  box-shadow: var(--md-elevation-2) !important;
+  transition: background .3s ease, box-shadow .3s ease !important;
+}
+
+/* 移动端展开菜单：加深半透明 + 强化模糊（tonal layering，保证白字可读） */
+@media (max-width: 991px) {
+  .site-nav-on .site-brand-container {
+    background: rgba(58, 138, 92, .88) !important;
+    backdrop-filter: blur(28px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
+    box-shadow: var(--md-elevation-3) !important;
+    border-bottom-color: rgba(255, 255, 255, .22) !important;
+  }
+}
+
+/* 菜单项：半透明 chip + 圆角 state layer */
+.menu .menu-item a {
+  border-radius: var(--md-radius-pill) !important;
+  transition: background .2s ease !important;
+}
+.menu .menu-item a:hover,
+.menu .menu-item.menu-item-active a {
+  background: rgba(255, 255, 255, .22) !important;
+}
