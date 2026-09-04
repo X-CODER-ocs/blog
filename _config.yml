@@ -110,6 +110,10 @@ feed:
   content_limit_deluxe:
   order_by: -date
 
+# Sitemap 站点地图（hexo-generator-sitemap，利于搜索引擎收录）
+sitemap:
+  path: sitemap.xml
+
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:

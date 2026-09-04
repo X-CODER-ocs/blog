@@ -124,3 +124,10 @@ utterances:
 # 配合 hexo-generator-feed 生成的 atom.xml，在站点底部/社交区显示 RSS 图标
 follow_me:
   RSS: /atom.xml || fa fa-rss
+
+# ------------------------------------------------------------ 阅读进度
+# 右下角回到顶部按钮 + 阅读百分比
+back2top:
+  enable: true
+  sidebar: false
+  scrollpercent: true

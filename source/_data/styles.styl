@@ -497,3 +497,17 @@ mark.search-keyword {
 .menu .menu-item.menu-item-active a {
   background: rgba(255, 255, 255, .22) !important;
 }
+
+/* ---------- 12. 顶部阅读进度条（MD3 主色 #4AA26F） ---------- */
+#md-read-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: var(--md-sys-color-primary);
+  box-shadow: 0 0 6px var(--md-sys-color-primary);
+  z-index: 9999;
+  transition: width .1s linear;
+  pointer-events: none;
+}
