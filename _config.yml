@@ -98,6 +98,18 @@ ignore:
 ## Themes: https://hexo.io/themes/
 theme: next
 
+# RSS / Atom Feed
+## 由 hexo-generator-feed 生成，NexT 会自动在站点挂出 RSS 图标
+feed:
+  type: atom
+  path: atom.xml
+  limit: 20
+  hub:
+  content: false
+  content_limit: 140
+  content_limit_deluxe:
+  order_by: -date
+
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:

@@ -119,3 +119,8 @@ utterances:
   repo: X-CODER-ocs/blog
   issue_term: pathname        # 用文章路径作为 issue 标识
   theme: github-light         # 浅色，与 #4AA26F 主题搭配
+
+# ------------------------------------------------------------ RSS
+# 配合 hexo-generator-feed 生成的 atom.xml，在站点底部/社交区显示 RSS 图标
+follow_me:
+  RSS: /atom.xml || fa fa-rss
