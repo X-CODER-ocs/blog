@@ -182,12 +182,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ---------- 5. 侧栏卡片 ---------- */
+/* 外层 .sidebar 原本是 $black-deep 直角黑底且撑满全高，会盖住内层圆角 → 改为透明 + 毛玻璃 */
+.sidebar {
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
 .sidebar-inner {
   background: var(--md-sys-color-surface) !important;
   border-radius: var(--md-radius-lg) !important;
   box-shadow: var(--md-elevation-1) !important;
   border: none !important;
   padding: 22px !important;
+  margin: 12px !important; /* 不贴边，呈现悬浮圆角卡片 */
 }
 html.dark .sidebar-inner,
 body.dark .sidebar-inner {
