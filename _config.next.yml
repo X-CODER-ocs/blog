@@ -71,6 +71,7 @@ post_meta:
     enable: true
     another_day: true
   categories: true
+  symbols_count_time: true
 
 excerpt_description: true
 read_more_btn: true
@@ -97,6 +98,12 @@ local_search:
   preload: false
   top_n_per_article: 1
   unescape: false
+
+# ---------------------------------------------------------------- Mermaid
+# 流程图 / 时序图 / 架构图（依赖 hexo-filter-mermaid-diagrams）
+# 文章里用 ```mermaid 代码块即可渲染
+mermaid:
+  enable: true
 
 # ------------------------------------------------------------ Extensions
 motion:

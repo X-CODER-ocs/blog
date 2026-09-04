@@ -114,6 +114,13 @@ feed:
 sitemap:
   path: sitemap.xml
 
+# 站内本地搜索（依赖 hexo-generator-searchdb，NexT 已启用 local_search）
+search:
+  path: search.xml
+  field: post
+  content: true
+  format: html
+
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
