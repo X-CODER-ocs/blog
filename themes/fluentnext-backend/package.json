@@ -1,0 +1,6 @@
+{
+  "name": "hexo-theme-fluentnext-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FluentNext 后端专用主题：不渲染可见 HTML 页面，仅让 hexo generate 能跑通，配合 scripts/fluentnext-content.js 输出 public/api/content.json 供 Blazor WASM 前端（FluentNext SPA）消费。真正的站点 UI 由前端仓库 X-CODER-ocs/fluentnext-frontend 提供。"
+}

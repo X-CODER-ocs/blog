@@ -4,7 +4,7 @@
 # ------------------------------------------------------------------
 
 # 外观方案: Muse | Mist | Pisces | Gemini
-scheme: Gemini
+scheme: Muse
 
 # 主题主色（链接、选中态、侧栏高亮、顶部条等）
 theme_color:
@@ -19,11 +19,6 @@ favicon:
   medium: /images/favicon-32x32.png
   apple_touch_icon: /images/apple-touch-icon.png
   safari_pinned_tab: /images/favicon.svg
-
-# 自定义样式与脚本（MD3 皮肤）
-custom_file_path:
-  style: source/_data/styles.styl
-  bodyEnd: source/_data/body-end.njk
 
 # ---------------------------------------------------------------- Menu
 menu:
@@ -138,3 +133,10 @@ back2top:
   enable: true
   sidebar: false
   scrollpercent: true
+
+# ------------------------------------------------------------ Google Analytics
+# NexT 自带 GA 支持，无需额外插件。填入 GA4 Measurement ID（格式 G-XXXXXXX）即生效
+# 留空则本地/CI 构建均不输出 GA 脚本，不影响站点运行
+google_analytics:
+  tracking_id: # 例：G-ABC123XYZ
+  only_pageview: false

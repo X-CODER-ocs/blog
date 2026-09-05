@@ -45,7 +45,8 @@ titlecase: false # Transform title into titlecase
 external_link:
   enable: true # Open external links in new tab
   field: site # Apply to the whole site
-  exclude: ''
+  exclude: []
+  external_icon: true # hexo-external-link：给外链自动加 ↗ 图标
 filename_case: 0
 render_drafts: false
 post_asset_folder: false
@@ -104,7 +105,11 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: next
+# ⚠️ FluentNext 架构：Hexo 仅作「内容后端」，不渲染可见页面。
+# 真站点 UI 由独立仓库 X-CODER-ocs/fluentnext-frontend（Blazor WASM + Fluent UI Blazor）提供，
+# 经 GitHub Actions 把发布产物拷进 public/ 并改写 base href 为 /blog/。
+# 本主题配合 scripts/fluentnext-content.js 仅产出 public/api/content.json（文章/分类/标签/归档/TOC）。
+theme: fluentnext-backend
 
 # RSS / Atom Feed
 ## 由 hexo-generator-feed 生成，NexT 会自动在站点挂出 RSS 图标
@@ -235,6 +240,21 @@ jsonContent:
     excerpt: false
   exclude: []
 
+# FluentNext 后端契约（供 scripts/fluentnext-content.js 读取；前端 SPA 侧边栏菜单目前为硬编码，
+# 此处保留以便日后把导航交给 Hexo 配置驱动）。
+fluentnext:
+  menu:
+    - name: 首页
+      url: /
+    - name: 分类
+      url: /categories
+    - name: 标签
+      url: /tags
+    - name: 归档
+      url: /archives
+    - name: 关于
+      url: /about
+
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 # 本博客实际发版由 GitHub Actions（actions/deploy-pages）完成；
@@ -243,3 +263,10 @@ deploy:
   - type: cjh_baidu_url_submitter
   - type: cjh_bing_url_submitter
   - type: cjh_google_url_submitter
+
+# 按目录自动归类（hexo-directory-category）
+# 仅当文章放在子目录（如 source/_posts/tech/xxx.md）时，自动取目录名为分类；
+# 当前文章平铺在 _posts/ 根下时不会产生新分类，留作以后按目录整理文章用。
+directory_category:
+  enable: true
+  top_down: false

@@ -18,8 +18,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout blog
         uses: actions/checkout@v4
+
+      # FluentNext 前端（Blazor WASM）独立仓库：拉到 fluentnext-src/ 构建。
+      # 公开仓库，actions/checkout 匿名克隆即可，无需额外 token。
+      - name: Checkout FluentNext 前端
+        uses: actions/checkout@v4
+        with:
+          repository: X-CODER-ocs/fluentnext-frontend
+          path: fluentnext-src
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -27,24 +35,75 @@ jobs:
           node-version: '22'
           cache: npm
 
-      - name: Install dependencies
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install npm dependencies
         run: npm ci
 
-      - name: Clean
+      # 构建 Blazor 前端 → .fn-dist/wwwroot（含 _framework / _content / appsettings.json / index.html）
+      - name: Build FluentNext 前端 (dotnet publish)
+        run: dotnet publish fluentnext-src/FluentNext.Frontend -c Release -o .fn-dist
+
+      # GitHub Pages 子路径是 /blog/，必须把 <base href="/"> 改成 /blog/，
+      # 否则 _framework / _content / appsettings.json 等相对资源会 404。
+      - name: Rewrite base href to /blog/
+        run: |
+          sed -i 's#<base href="/" />#<base href="/blog/" />#' .fn-dist/wwwroot/index.html
+          echo "base href -> $(grep -o '<base href="[^"]*"' .fn-dist/wwwroot/index.html)"
+
+      # 从 GitHub Secrets 注入 Gitalk 的 clientID / clientSecret 到 appsettings.json。
+      # ⚠️ secrets 只能进 env，绝不写进 if:（否则 workflow 解析失败、job 全挂）。
+      # 未配置密钥时保留占位，前端登录会提示去填；不影响站点其余功能。
+      - name: Inject Gitalk secrets into appsettings.json
+        env:
+          GID: ${{ secrets.GITALK_CLIENT_ID }}
+          GSEC: ${{ secrets.GITALK_CLIENT_SECRET }}
+        run: |
+          if [ -n "$GID" ] && [ -n "$GSEC" ]; then
+            jq --arg id "$GID" --arg sec "$GSEC" \
+              '.FluentNext.comments.gitalk.clientID=$id | .FluentNext.comments.gitalk.clientSecret=$sec' \
+              .fn-dist/wwwroot/appsettings.json > .fn-dist/wwwroot/appsettings.json.tmp
+            mv .fn-dist/wwwroot/appsettings.json.tmp .fn-dist/wwwroot/appsettings.json
+            echo "已注入 Gitalk clientID / clientSecret"
+          else
+            echo "GITALK_CLIENT_ID / GITALK_CLIENT_SECRET 未配置，跳过注入（评论登录将提示填写）"
+          fi
+
+      - name: Clean Hexo
         run: npx hexo clean
 
-      - name: Build
+      # 生成「真 Hexo 后端」：scripts/fluentnext-content.js 输出 public/api/content.json
+      - name: Build Hexo (content.json 后端)
         run: npx hexo generate
 
-      # 搜索引擎收录推送：必应（BING_TOKEN 走环境变量）+ Google（读 google-key.json 文件）
-      #
-      # ⚠️ 关键约束：secrets context 不能用于 step/job 的 if 条件（GitHub 仅允许
-      #    github / needs / vars / inputs / env 等 context）。在 if 里写 secrets.X 会直接
-      #    导致 workflow 文件解析失败、一个 job 都跑不起来（run 名会退化成文件路径）。
-      #    因此统一改为：secrets 注入 env，在 shell 里判断是否为空。
-      #
-      # 百度暂未启用：BAIDU_TOKEN 未配置（_config.yml 中 baidu: 0）。
-      # 待配置后：_config.yml 的 baidu 改回 1，并在下面 env 增加 BAIDU_TOKEN: ${{ secrets.BAIDU_TOKEN }}
+      # 把 Blazor 发布产物拷进 public/，覆盖 NexT 生成的 index.html，
+      # 但排除 api/（保留 Hexo 生成的真 content.json），并保留搜索引擎验证文件。
+      - name: Copy FluentNext 前端到 public/
+        shell: bash
+        run: |
+          set -e
+          shopt -s nullglob
+          # 清理 Hexo 主题渲染出的「幽灵」静态页（文章 / 分类 / 标签 / 归档 / 关于 / 分页），
+          # 真正的页面由 Blazor SPA 客户端路由呈现。保留：
+          #   api/            —— 真 Hexo 后端 content.json（rsync 用 --exclude 保护）
+          #   atom.xml 等     —— feed / sitemap / search 等生成器产物
+          #   根目录验证文件   —— BingSiteAuth.xml / google*.html / baidu_verify_*.html
+          rm -rf public/20[0-9][0-9] public/categories public/tags public/archives public/about public/page 2>/dev/null || true
+          rsync -a --exclude='/api' .fn-dist/wwwroot/ public/
+          # 兜底：GitHub Pages Actions 部署不经 Jekyll，加 .nojekyll 防止 _framework/_content 被忽略
+          : > public/.nojekyll
+          # SPA 深链兜底：GitHub Pages 无服务端回退。把 SPA 入口复制为 404.html，
+          # 任意未知路径（如硬刷新 /blog/post/xxx）都回退到 Blazor 入口，由客户端路由接管。
+          cp public/index.html public/404.html
+          echo "public 顶层:"; ls public
+          echo "content.json 来源校验:"; ls -l public/api/content.json
+          echo "404.html 兜底:"; ls -l public/404.html
+
+      # 搜索引擎收录推送：必应（BING_TOKEN）+ Google（google-key.json）
+      # secrets 注入 env，shell 内判空（详见上方说明）。
       - name: Write Google Indexing key
         env:
           GOOGLE_KEY_JSON: ${{ secrets.GOOGLE_KEY_JSON }}
@@ -67,15 +126,11 @@ jobs:
           fi
           npx hexo deploy
 
-      # 搜索引擎站点验证文件守卫：Google / Bing 官方要求验证文件永久保留在站点根。
-      # 若文件被误删、或 _config.yml 的 skip_render 被误改导致 .html 被套模板渲染，
-      # 均会让验证失效。此处构建后强制校验，不通过则阻断部署。
-      # 用 glob 动态匹配，验证文件换名（如换账户后哈希变化）时无需改动本步。
+      # 搜索引擎站点验证文件守卫：官方要求永久保留在站点根，被删/被渲染则阻断部署。
       - name: Guard search engine auth files
         shell: bash
         run: |
           set -e
-          # 用 bash 数组 + nullglob 收集验证文件：换名（换账户后哈希变化）无需改动本步
           shopt -s nullglob
           files=(public/BingSiteAuth.xml public/google*.html public/baidu_verify_*.html)
           for f in "${files[@]}"; do
