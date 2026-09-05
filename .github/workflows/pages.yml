@@ -36,18 +36,19 @@ jobs:
       - name: Build
         run: npx hexo generate
 
-      - name: Write Google Indexing key (if provided)
-        if: ${{ secrets.GOOGLE_KEY_JSON != '' }}
-        run: echo "${{ secrets.GOOGLE_KEY_JSON }}" > google-key.json
+      # Google Indexing API 暂未启用：需先在 Google Search Console 验证站点并创建服务账号，
+      # 拿到 GOOGLE_KEY_JSON 后取消下面注释、并在仓库 Secrets 填入，再重新启用。
+      # - name: Write Google Indexing key (if provided)
+      #   if: ${{ secrets.GOOGLE_KEY_JSON != '' }}
+      #   run: echo "${{ secrets.GOOGLE_KEY_JSON }}" > google-key.json
 
       - name: Submit URLs to search engines
         continue-on-error: true
-        if: ${{ secrets.BAIDU_TOKEN != '' || secrets.BING_TOKEN != '' || secrets.GOOGLE_KEY_JSON != '' }}
+        if: ${{ secrets.BAIDU_TOKEN != '' || secrets.BING_TOKEN != '' }}
         run: npx hexo deploy
         env:
           BAIDU_TOKEN: ${{ secrets.BAIDU_TOKEN }}
           BING_TOKEN: ${{ secrets.BING_TOKEN }}
-          GOOGLE_KEY_JSON: ${{ secrets.GOOGLE_KEY_JSON }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
