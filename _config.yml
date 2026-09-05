@@ -111,11 +111,9 @@ theme: next
 feed:
   type: atom
   path: atom.xml
-  limit: 20
+  limit: 0
   hub:
-  content: false
-  content_limit: 140
-  content_limit_deluxe:
+  content: true
   order_by: -date
 
 # Sitemap 站点地图（hexo-generator-sitemap，利于搜索引擎收录）
