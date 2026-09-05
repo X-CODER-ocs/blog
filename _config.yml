@@ -201,7 +201,7 @@ hexo_submit_urls_to_search_engine:
   period: 900
   txt_path: urls.txt
   replace: 0
-  baidu: 1
+  baidu: 0                # 百度推送暂关：BAIDU_TOKEN 未配置，配好后改回 1 并在 CI env 注入
   baidu_host: https://x-coder-ocs.github.io/blog
   baidu_token: 0          # 0 = 从环境变量 BAIDU_TOKEN 读取
   bing: 1

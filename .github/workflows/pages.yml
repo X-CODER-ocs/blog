@@ -36,22 +36,22 @@ jobs:
       - name: Build
         run: npx hexo generate
 
-      # Google Indexing API 暂未启用：需先在 Google Search Console 验证站点并创建服务账号，
-      # 拿到 GOOGLE_KEY_JSON 后取消下面注释、并在仓库 Secrets 填入，再重新启用。
-      # - name: Write Google Indexing key (if provided)
-      #   if: ${{ secrets.GOOGLE_KEY_JSON != '' }}
-      #   run: echo "${{ secrets.GOOGLE_KEY_JSON }}" > google-key.json
+      # 写入 Google Indexing API 服务账号密钥（由 Secret 提供，文件绝不入库）。
+      # 插件 google_submitter 用 require() 读 base_dir 下的 google-key.json 文件，不走环境变量，故必须先落盘。
+      - name: Write Google Indexing key
+        if: ${{ secrets.GOOGLE_KEY_JSON != '' }}
+        run: echo "${{ secrets.GOOGLE_KEY_JSON }}" > google-key.json
 
-      # 搜索引擎收录推送(百度/必应/Google)暂未启用：当前仓库 Secrets 中 BAIDU_TOKEN / BING_TOKEN / GOOGLE_KEY_JSON 均未配置，
-      # 在 workflow 的 if/env 中引用未定义 secret 会导致 "workflow file issue" 启动失败。待三者都配置到仓库 Secrets 后，
-      # 取消下面注释并重新启用（同时按需恢复 Google key 写入步）。
-      # - name: Submit URLs to search engines
-      #   continue-on-error: true
-      #   if: ${{ secrets.BAIDU_TOKEN != '' || secrets.BING_TOKEN != '' }}
-      #   run: npx hexo deploy
-      #   env:
-      #     BAIDU_TOKEN: ${{ secrets.BAIDU_TOKEN }}
-      #     BING_TOKEN: ${{ secrets.BING_TOKEN }}
+      # 搜索引擎收录推送：必应（BING_TOKEN 走环境变量）+ Google（读 google-key.json 文件）
+      # ⚠️ 百度暂未启用：BAIDU_TOKEN 尚未配置（_config.yml 中 baidu: 0）。
+      #    切勿在 if/env 中引用未定义的 secret，否则触发 "workflow file issue" 导致整个 workflow 启动失败。
+      #    待 BAIDU_TOKEN 配置后：_config.yml 的 baidu 改回 1，并在下面 env 增加 BAIDU_TOKEN。
+      - name: Submit URLs to search engines
+        continue-on-error: true
+        if: ${{ secrets.BING_TOKEN != '' || secrets.GOOGLE_KEY_JSON != '' }}
+        run: npx hexo deploy
+        env:
+          BING_TOKEN: ${{ secrets.BING_TOKEN }}
 
       # 搜索引擎站点验证文件守卫：Google / Bing 官方要求验证文件永久保留在站点根。
       # 若文件被误删、或 _config.yml 的 skip_render 被误改导致 .html 被套模板渲染，
