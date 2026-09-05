@@ -44,8 +44,9 @@ jobs:
         run: npm ci
 
       # 构建 Blazor 前端 → .fn-dist/wwwroot（含 _framework / _content / appsettings.json / index.html）
+      # ⚠️ 前端仓库的 .csproj 在仓库根（无外层 FluentNext.Frontend/ 子目录），须显式指向根 .csproj
       - name: Build FluentNext 前端 (dotnet publish)
-        run: dotnet publish fluentnext-src/FluentNext.Frontend -c Release -o .fn-dist
+        run: dotnet publish fluentnext-src/FluentNext.Frontend.csproj -c Release -o .fn-dist
 
       # GitHub Pages 子路径是 /blog/，必须把 <base href="/"> 改成 /blog/，
       # 否则 _framework / _content / appsettings.json 等相对资源会 404。
