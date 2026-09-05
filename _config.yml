@@ -28,9 +28,15 @@ archive_dir: archives
 category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
+# 搜索引擎站点验证文件（Google / Bing / 百度）
+# 官方要求：验证通过后文件须永久保留在站点根，删除会导致验证失效、收录被取消。
+# ⚠️ 必须列入 skip_render，否则 hexo 会把 .html 当 page 套上 NexT 模板，
+#    输出 13KB 完整网页，验证串被淹没导致验证失败。
+# ⚠️ 勿删、勿改名、勿移出 source/ 根（子路径站点根 = source/，非 source/blog/）。
 skip_render:
   - 'google*.html'
   - 'BingSiteAuth.xml'
+  - 'baidu_verify_*.html'
 
 # Writing
 new_post_name: :title.md # File name of new posts

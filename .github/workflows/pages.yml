@@ -53,6 +53,25 @@ jobs:
       #     BAIDU_TOKEN: ${{ secrets.BAIDU_TOKEN }}
       #     BING_TOKEN: ${{ secrets.BING_TOKEN }}
 
+      # 搜索引擎站点验证文件守卫：Google / Bing 官方要求验证文件永久保留在站点根。
+      # 若文件被误删、或 _config.yml 的 skip_render 被误改导致 .html 被套模板渲染，
+      # 均会让验证失效。此处构建后强制校验，不通过则阻断部署。
+      - name: Guard search engine auth files
+        run: |
+          set -e
+          for f in google7abbd295e59b27c4.html BingSiteAuth.xml; do
+            if [ ! -f "public/$f" ]; then
+              echo "::error::缺少搜索引擎验证文件 public/$f（勿删，官方要求永久保留）"
+              exit 1
+            fi
+            size=$(wc -c < "public/$f")
+            if [ "$size" -gt 1000 ]; then
+              echo "::error::$f 大小 ${size} 字节，疑似被渲染，检查 _config.yml 的 skip_render"
+              exit 1
+            fi
+            echo "OK: $f (${size} 字节，纯文本)"
+          done
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
