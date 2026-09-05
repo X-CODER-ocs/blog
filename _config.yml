@@ -181,7 +181,54 @@ admin:
 
 # PWA / 离线缓存（hexo-offline，零配置即用：地址栏出现「安装」按钮，断网可看已读文章）
 
+# 搜索引擎收录推送（hexo-submit-urls-to-search-engine：百度 + Google + 必应 三合一）
+# 注意：实际「提交」发生在 hexo deploy 阶段（CI 在 build 后已加该步骤）。
+# token 不写死在配置里，走 CI 环境变量（仓库 Secrets）：
+#   BAIDU_TOKEN  = 百度搜索资源平台「推送接口」里的 token
+#   BING_TOKEN   = Bing Webmaster Tools 的 IndexNow API key
+#   GOOGLE_KEY_JSON = Google 服务账号私钥 JSON（整段），CI 写入 google-key.json 后由 google_key_file 引用
+hexo_submit_urls_to_search_engine:
+  submit_condition: count
+  count: 10
+  period: 900
+  txt_path: urls.txt
+  replace: 0
+  baidu: 1
+  baidu_host: https://x-coder-ocs.github.io/blog
+  baidu_token: 0          # 0 = 从环境变量 BAIDU_TOKEN 读取
+  bing: 1
+  bing_host: https://x-coder-ocs.github.io/blog
+  bing_token: 0           # 0 = 从环境变量 BING_TOKEN 读取
+  google: 1
+  google_host: https://x-coder-ocs.github.io/blog
+  google_key_file: google-key.json   # CI 中由 secrets.GOOGLE_KEY_JSON 写入；本地无此文件时 hexo deploy 会报错（仅 deploy 阶段，不影响 generate）
+  google_proxy: 0
+
+# 内容开放 API（hexo-generator-json-content：输出 public/content.json，供自家 App / 小程序 / 全文搜索调用）
+jsonContent:
+  meta: true
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: true
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    tag: true
+    category: false
+    author: true
+    excerpt: false
+  exclude: []
+
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
+# 本博客实际发版由 GitHub Actions（actions/deploy-pages）完成；
+# 下面的 cjh_* submitter 仅用于「部署时顺手把 URL 推给搜索引擎」，不负责页面发布。
 deploy:
-  type: ''
+  - type: cjh_baidu_url_submitter
+  - type: cjh_bing_url_submitter
+  - type: cjh_google_url_submitter

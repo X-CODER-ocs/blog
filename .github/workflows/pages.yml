@@ -36,6 +36,19 @@ jobs:
       - name: Build
         run: npx hexo generate
 
+      - name: Write Google Indexing key (if provided)
+        if: ${{ secrets.GOOGLE_KEY_JSON != '' }}
+        run: echo "${{ secrets.GOOGLE_KEY_JSON }}" > google-key.json
+
+      - name: Submit URLs to search engines
+        continue-on-error: true
+        if: ${{ secrets.BAIDU_TOKEN != '' || secrets.BING_TOKEN != '' || secrets.GOOGLE_KEY_JSON != '' }}
+        run: npx hexo deploy
+        env:
+          BAIDU_TOKEN: ${{ secrets.BAIDU_TOKEN }}
+          BING_TOKEN: ${{ secrets.BING_TOKEN }}
+          GOOGLE_KEY_JSON: ${{ secrets.GOOGLE_KEY_JSON }}
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
