@@ -70,23 +70,11 @@ jobs:
           echo "boot script -> _framework/$HASHED"
           grep -n 'blazor.webassembly' .fn-dist/wwwroot/index.html
 
-      # 从 GitHub Secrets 注入 Gitalk 的 clientID / clientSecret 到 appsettings.json。
-      # ⚠️ secrets 只能进 env，绝不写进 if:（否则 workflow 解析失败、job 全挂）。
-      # 未配置密钥时保留占位，前端登录会提示去填；不影响站点其余功能。
-      - name: Inject Gitalk secrets into appsettings.json
-        env:
-          GID: ${{ secrets.GITALK_CLIENT_ID }}
-          GSEC: ${{ secrets.GITALK_CLIENT_SECRET }}
-        run: |
-          if [ -n "$GID" ] && [ -n "$GSEC" ]; then
-            jq --arg id "$GID" --arg sec "$GSEC" \
-              '.FluentNext.comments.gitalk.clientID=$id | .FluentNext.comments.gitalk.clientSecret=$sec' \
-              .fn-dist/wwwroot/appsettings.json > .fn-dist/wwwroot/appsettings.json.tmp
-            mv .fn-dist/wwwroot/appsettings.json.tmp .fn-dist/wwwroot/appsettings.json
-            echo "已注入 Gitalk clientID / clientSecret"
-          else
-            echo "GITALK_CLIENT_ID / GITALK_CLIENT_SECRET 未配置，跳过注入（评论登录将提示填写）"
-          fi
+      # 评论系统已切换为 Utterances（基于 GitHub Issues），无需任何 client secret，
+      # 仅需仓库 X-CODER-ocs/blog 已安装 utterances GitHub App 且 Issues 开启。
+      # 因此此处不再注入 Gitalk 密钥。
+      - name: Comments provider check
+        run: echo "评论：Utterances（无需密钥注入）"
 
       - name: Clean Hexo
         run: npx hexo clean
