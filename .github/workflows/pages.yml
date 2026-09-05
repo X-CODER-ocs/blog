@@ -114,6 +114,11 @@ jobs:
           # SPA 深链兜底：GitHub Pages 无服务端回退。把 SPA 入口复制为 404.html，
           # 任意未知路径（如硬刷新 /blog/post/xxx）都回退到 Blazor 入口，由客户端路由接管。
           cp public/index.html public/404.html
+          # 旧 NexT 的带日期 / 绝对路径外链（如 /post/xxx、/2026/09/05/xxx）缺失 /blog/ 前缀会 404。
+          # 在 404 兜底页顶部注入重定向：把这类路径补回 /blog/ 前缀，交还 SPA 客户端路由接管。
+          REDIRECT='<script>try{if(location.pathname.charAt(0)==="/"&&!location.pathname.startsWith("/blog/")){location.replace("/blog"+location.pathname+location.search+location.hash);}}catch(e){}<\/script>'
+          sed -i "s#<head>#<head>$REDIRECT#" public/404.html
+          echo "404.html 重定向注入条数:"; grep -c 'location.pathname.startsWith' public/404.html
           # 清掉旧 NexT 主题的 PWA 残留：service-worker.js / workbox-*.js 会劫持浏览器缓存，
           # 让已注册旧 SW 的浏览器用过期资源喂 Blazor，导致 JS 加载失败。删除后旧 SW 在下次导航自检 404 时自动注销。
           rm -f public/service-worker.js public/workbox-*.js
