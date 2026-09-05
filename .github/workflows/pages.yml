@@ -42,13 +42,16 @@ jobs:
       #   if: ${{ secrets.GOOGLE_KEY_JSON != '' }}
       #   run: echo "${{ secrets.GOOGLE_KEY_JSON }}" > google-key.json
 
-      - name: Submit URLs to search engines
-        continue-on-error: true
-        if: ${{ secrets.BAIDU_TOKEN != '' || secrets.BING_TOKEN != '' }}
-        run: npx hexo deploy
-        env:
-          BAIDU_TOKEN: ${{ secrets.BAIDU_TOKEN }}
-          BING_TOKEN: ${{ secrets.BING_TOKEN }}
+      # 搜索引擎收录推送(百度/必应/Google)暂未启用：当前仓库 Secrets 中 BAIDU_TOKEN / BING_TOKEN / GOOGLE_KEY_JSON 均未配置，
+      # 在 workflow 的 if/env 中引用未定义 secret 会导致 "workflow file issue" 启动失败。待三者都配置到仓库 Secrets 后，
+      # 取消下面注释并重新启用（同时按需恢复 Google key 写入步）。
+      # - name: Submit URLs to search engines
+      #   continue-on-error: true
+      #   if: ${{ secrets.BAIDU_TOKEN != '' || secrets.BING_TOKEN != '' }}
+      #   run: npx hexo deploy
+      #   env:
+      #     BAIDU_TOKEN: ${{ secrets.BAIDU_TOKEN }}
+      #     BING_TOKEN: ${{ secrets.BING_TOKEN }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
