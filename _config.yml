@@ -121,6 +121,66 @@ search:
   content: true
   format: html
 
+# 文章加密（hexo-blog-encrypt，文章 front-matter 加 password 即生效）
+encrypt:
+  enable: true
+
+# markdown-it 渲染器（替代默认 hexo-renderer-marked，支持脚注/任务清单/上下标/标记）
+# 需先卸载默认 marked 渲染器，否则冲突
+markdown:
+  render:
+    html: true
+    xhtmlOut: false
+    breaks: false
+    linkify: true
+    typographer: false
+    quotes: '“”‘’'
+  plugins:
+    - markdown-it-footnote
+    - markdown-it-mark
+    - markdown-it-sub
+    - markdown-it-sup
+    - name: markdown-it-task-lists
+      options:
+        enabled: true
+        label: true
+        labelAfter: true
+  anchors:
+    level: 2
+    permalink: true
+    permalinkClass: header-anchor
+    permalinkSymbol: ¶
+
+# 首页自动摘要（按字数截断，省去手动 <!-- more -->）
+excerpt_length: 220
+
+# 外链自动加 rel="nofollow noopener"（SEO + 防权重流失）
+nofollow:
+  enable: true
+  field: site
+  exclude:
+    - x-coder-ocs.github.io
+
+# 文末相关文章（hexo-related-popular-posts，本地按标签相似度，无需任何账号）
+# 显示位置/标题/数量在主题模板 _macro/post.njk 的 popular_posts() 里设置
+
+# GitHub 风 emoji 短码（:rocket: :bug: 等渲染成图标，正文按需使用）
+githubEmojis:
+  enable: true
+  className: github-emoji
+  inject: true
+  styles:
+  customEmojis:
+
+# 浏览器内写文后台（仅本地 hexo server 时可用；部署的静态站不会暴露此功能）
+# ⚠️ 默认账号 xcoder / 密码 x-coder-blog，请尽快访问 /admin/ 设置页修改！
+admin:
+  username: xcoder
+  password_hash: $2a$10$5/.nq6fnIryqb2shKX3Xa.zLzdt..xGLAmGjKKexFNQaqAXqiwrTy
+  secret: change-this-secret-xcoder-blog-2026
+
+# PWA / 离线缓存（hexo-offline，零配置即用：地址栏出现「安装」按钮，断网可看已读文章）
+
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:

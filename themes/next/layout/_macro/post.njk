@@ -149,6 +149,10 @@
           </div>
         {%- endif %}
 
+        {# 文末相关文章（hexo-related-popular-posts，本地模式按标签相似度，无需账号） #}
+        <h3 class="popular-posts-heading">相关文章</h3>
+        {{- popular_posts({length: 4, orderBy: 'date', isDate: false}, post) }}
+
       {%- endif %}
     </footer>
   </article>
