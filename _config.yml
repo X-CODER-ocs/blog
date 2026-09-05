@@ -119,8 +119,13 @@ feed:
   order_by: -date
 
 # Sitemap 站点地图（hexo-generator-sitemap，利于搜索引擎收录）
+# 只收录真实文章：自定义模板 hexo-sitemap-posts.xml 仅输出 source 在 _posts/ 下的文章，
+# 并关闭 tags/categories 归档页与首页，避免浪费搜索引擎抓取配额。
 sitemap:
   path: sitemap.xml
+  template: hexo-sitemap-posts.xml
+  tags: false
+  categories: false
 
 # 站内本地搜索（依赖 hexo-generator-searchdb，NexT 已启用 local_search）
 search:
