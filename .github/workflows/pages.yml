@@ -56,20 +56,25 @@ jobs:
       # 搜索引擎站点验证文件守卫：Google / Bing 官方要求验证文件永久保留在站点根。
       # 若文件被误删、或 _config.yml 的 skip_render 被误改导致 .html 被套模板渲染，
       # 均会让验证失效。此处构建后强制校验，不通过则阻断部署。
+      # 用 glob 动态匹配，验证文件换名（如换账户后哈希变化）时无需改动本步。
       - name: Guard search engine auth files
+        shell: bash
         run: |
           set -e
-          for f in google7abbd295e59b27c4.html BingSiteAuth.xml; do
-            if [ ! -f "public/$f" ]; then
-              echo "::error::缺少搜索引擎验证文件 public/$f（勿删，官方要求永久保留）"
+          # 用 bash 数组 + nullglob 收集验证文件：换名（换账户后哈希变化）无需改动本步
+          shopt -s nullglob
+          files=(public/BingSiteAuth.xml public/google*.html public/baidu_verify_*.html)
+          for f in "${files[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "::error::缺少搜索引擎验证文件 $f（勿删，官方要求永久保留）"
               exit 1
             fi
-            size=$(wc -c < "public/$f")
+            size=$(wc -c < "$f")
             if [ "$size" -gt 1000 ]; then
-              echo "::error::$f 大小 ${size} 字节，疑似被渲染，检查 _config.yml 的 skip_render"
+              echo "::error::$(basename "$f") 大小 ${size} 字节，疑似被渲染，检查 _config.yml 的 skip_render"
               exit 1
             fi
-            echo "OK: $f (${size} 字节，纯文本)"
+            echo "OK: $(basename "$f") (${size} 字节，纯文本)"
           done
 
       - name: Setup Pages
