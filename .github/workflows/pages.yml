@@ -55,6 +55,21 @@ jobs:
           sed -i 's#<base href="/" />#<base href="/blog/" />#' .fn-dist/wwwroot/index.html
           echo "base href -> $(grep -o '<base href="[^"]*"' .fn-dist/wwwroot/index.html)"
 
+      # ⚠️ .NET 10 发布把 blazor.webassembly.js 指纹化为哈希文件名，并只在 importmap 里映射。
+      # 但 index.html 里的经典 <script src="_framework/blazor.webassembly.js"> 标签不受 importmap 管辖，
+      # 会去请求根本不存在的无哈希文件 → 404 → Blazor 永远起不来（表现为开屏动画一直转 / 某 JS 打不开）。
+      # 这里把 script 的 src 改写指向发布时的真实哈希文件。
+      - name: Fix Blazor boot script fingerprint
+        run: |
+          HASHED=$(ls .fn-dist/wwwroot/_framework/blazor.webassembly.*.js 2>/dev/null | head -1 | xargs -n1 basename)
+          if [ -z "$HASHED" ]; then
+            echo "::error::找不到 blazor.webassembly.*.js，发布产物异常"
+            exit 1
+          fi
+          sed -i "s#src=\"_framework/blazor.webassembly.js\"#src=\"_framework/$HASHED\"#" .fn-dist/wwwroot/index.html
+          echo "boot script -> _framework/$HASHED"
+          grep -n 'blazor.webassembly' .fn-dist/wwwroot/index.html
+
       # 从 GitHub Secrets 注入 Gitalk 的 clientID / clientSecret 到 appsettings.json。
       # ⚠️ secrets 只能进 env，绝不写进 if:（否则 workflow 解析失败、job 全挂）。
       # 未配置密钥时保留占位，前端登录会提示去填；不影响站点其余功能。
@@ -99,6 +114,9 @@ jobs:
           # SPA 深链兜底：GitHub Pages 无服务端回退。把 SPA 入口复制为 404.html，
           # 任意未知路径（如硬刷新 /blog/post/xxx）都回退到 Blazor 入口，由客户端路由接管。
           cp public/index.html public/404.html
+          # 清掉旧 NexT 主题的 PWA 残留：service-worker.js / workbox-*.js 会劫持浏览器缓存，
+          # 让已注册旧 SW 的浏览器用过期资源喂 Blazor，导致 JS 加载失败。删除后旧 SW 在下次导航自检 404 时自动注销。
+          rm -f public/service-worker.js public/workbox-*.js
           echo "public 顶层:"; ls public
           echo "content.json 来源校验:"; ls -l public/api/content.json
           echo "404.html 兜底:"; ls -l public/404.html
