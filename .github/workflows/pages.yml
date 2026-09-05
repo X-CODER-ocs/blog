@@ -143,7 +143,10 @@ jobs:
             echo "必应 / Google 密钥均未配置，跳过推送"
             exit 0
           fi
-          npx hexo deploy
+          # ⚠️ 必须 --skip-generate：否则 hexo deploy 会先重跑 hexo generate，
+          # 把旧 NexT PWA 插件生成的 service-worker.js / workbox 重新写回 public/，
+          # 覆盖上面删掉的残留，并复活被清理的「幽灵」静态页。
+          npx hexo deploy --skip-generate
 
       # 搜索引擎站点验证文件守卫：官方要求永久保留在站点根，被删/被渲染则阻断部署。
       - name: Guard search engine auth files
@@ -164,6 +167,13 @@ jobs:
             fi
             echo "OK: $(basename "$f") (${size} 字节，纯文本)"
           done
+
+      # 兜底清理：若上方任何步骤仍把旧 NexT PWA 残留写回 public/，上传前彻底删除，
+      # 避免 service worker 劫持 Blazor 资源缓存、导致 JS 加载失败。
+      - name: Remove legacy PWA leftovers before upload
+        run: |
+          rm -f public/service-worker.js public/workbox-*.js public/service-worker.js.map public/workbox-*.js.map
+          echo "PWA 残留清理后 public 顶层:"; ls public
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
