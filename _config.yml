@@ -14,7 +14,10 @@ timezone: Asia/Shanghai
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
 url: https://x-coder-ocs.github.io/blog
-permalink: :year/:month/:day/:title/
+# ⚠️ FluentNext 架构：真页面由 Blazor SPA 客户端路由呈现，文章路由为 /post/{slug}。
+# permalink 必须指向 SPA 路由，否则 atom.xml / sitemap / 站内搜索里的链接会落到
+# 后端主题「不渲染」的日期固定页（404）。改后所有文章链接统一为 /blog/post/{slug}/。
+permalink: /post/:slug/
 permalink_defaults:
 pretty_urls:
   trailing_index: true # Set to false to remove trailing 'index.html' from permalinks
