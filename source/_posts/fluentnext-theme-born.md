@@ -16,7 +16,7 @@ description: '把博客前端从 NexT 换成 Blazor WASM —— Hexo 退到「�
 
 呐,博客又双叒换皮了 qwq。
 
-这次换得有点激进:前端不是 JS,而是**用 .NET 写的**——确切地说,是 **Blazor WebAssembly**,配合微软官方的 **Fluent UI Blazor** 组件库。换完之后的皮肤我起名叫 **FluentNext**("Flu"ent 借 Fluent UI,"Next" 致敬陪我一路走来的 NexT,合在一起算个续作 awa)。
+这次换得有点激进:前端不是 JS,而是**用 .NET 写的**——确切地说,是 **Blazor WebAssembly**,配合微软官方的 **Fluent UI Blazor** 组件库。换完之后的皮肤我起名叫 **FluentNext**("Fluent" 借 Fluent UI,"Next" 致敬陪我一路走来的 NexT,合在一起算个续作 awa)。
 
 这是换之前的最后一张截图——NexT 的 Gemini 暗色方案,绿底品牌、深灰背景、文章列表 + 头像资料卡,看着其实挺好看的:
 
@@ -32,7 +32,7 @@ description: '把博客前端从 NexT 换成 Blazor WASM —— Hexo 退到「�
 
 `hexo new post "x"` → 写 Markdown → `hexo generate` → `hexo deploy` —— Hexo 这套流程顺得很,**但它的主题全是用 EJS + Stylus + CoffeeScript 写的**。换句话说,你想改个按钮样式,得去翻老古董时代的模板语法;想加个交互,得在 jQuery 的祖传代码堆里游泳。
 
-而我这两年一直在写 .NET,看到 `Razor` 组件这种东西实在回不去了:
+而我一直在使用 .NET,看到 `Razor` 组件这种东西实在回不去了:
 
 ```razor
 <FluentCard>
