@@ -15,7 +15,7 @@
     "hexo": "^7.0.0",
     "hexo-admin": "^2.3.0",
     "hexo-auto-excerpt": "^1.1.2",
-    "hexo-blog-encrypt": "^4.0.2",
+    "hexo-blog-encrypt": "^4.0.3",
     "hexo-browsersync": "^0.3.0",
     "hexo-cli": "^4.3.2",
     "hexo-directory-category": "^1.1.4",
