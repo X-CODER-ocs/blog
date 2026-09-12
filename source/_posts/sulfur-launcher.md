@@ -120,13 +120,14 @@ sl://launch?id=1.20.1-forge&server=play.example.com&port=25565
 
 ## 全平台都能用，下载在这儿
 
+> 所有下载都来自 [Releases](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases)；正式版永远指向最新发布，commit / nightly 指向对应构建通道。
+
 | 平台 | 正式版 | commit 版 | nightly 版 |
 | --- | --- | --- | --- |
-| **Windows 10 / 11 x64** | 安装程序 / 便携版 | 安装程序 / 便携版 | 安装程序 / 便携版 |
-| **macOS Apple Silicon** | 磁盘映像 / 应用包 | 磁盘映像 / 应用包 | 磁盘映像 / 应用包 |
-| **macOS Intel** | 磁盘映像 / 应用包 | 磁盘映像 / 应用包 | 磁盘映像 / 应用包 |
-| **Linux x64** | AppImage / deb / rpm | AppImage / deb / rpm | AppImage / deb / rpm |
-| **Arch Linux / AUR** | `portal-mc-bin` | `portal-mc-commit-bin` | `portal-mc-nightly-bin` |
+| **Windows 10 / 11 x64** | [安装程序](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/latest/download/SulfurLauncher.win.x64.installer.zip) / [便携版](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/latest/download/SulfurLauncher.win.x64.portable.zip) | [安装程序](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-commit/SulfurLauncher.win.x64.installer.zip) / [便携版](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-commit/SulfurLauncher.win.x64.portable.zip) | [安装程序](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-nightly/SulfurLauncher.win.x64.installer.zip) / [便携版](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-nightly/SulfurLauncher.win.x64.portable.zip) |
+| **macOS Apple Silicon** | [磁盘映像](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/latest/download/SulfurLauncher.osx.mac.arm64.dmg) / [应用包](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/latest/download/SulfurLauncher.osx.mac.arm64.app.zip) | [磁盘映像](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-commit/SulfurLauncher.osx.mac.arm64.dmg) / [应用包](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-commit/SulfurLauncher.osx.mac.arm64.app.zip) | [磁盘映像](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-nightly/SulfurLauncher.osx.mac.arm64.dmg) / [应用包](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-nightly/SulfurLauncher.osx.mac.arm64.app.zip) |
+| **macOS Intel** | [磁盘映像](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/latest/download/SulfurLauncher.osx.mac.x64.dmg) / [应用包](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/latest/download/SulfurLauncher.osx.mac.x64.app.zip) | [磁盘映像](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-commit/SulfurLauncher.osx.mac.x64.dmg) / [应用包](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-commit/SulfurLauncher.osx.mac.x64.app.zip) | [磁盘映像](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-nightly/SulfurLauncher.osx.mac.x64.dmg) / [应用包](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-nightly/SulfurLauncher.osx.mac.x64.app.zip) |
+| **Linux x64** | [AppImage](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/latest/download/SulfurLauncher.linux.x64.AppImage) / [deb](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/latest/download/SulfurLauncher.linux.x64.deb) / [rpm](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/latest/download/SulfurLauncher.linux.x64.rpm) | [AppImage](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-commit/SulfurLauncher.linux.x64.AppImage) / [deb](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-commit/SulfurLauncher.linux.x64.deb) / [rpm](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-commit/SulfurLauncher.linux.x64.rpm) | [AppImage](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-nightly/SulfurLauncher.linux.x64.AppImage) / [deb](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-nightly/SulfurLauncher.linux.x64.deb) / [rpm](https://github.com/X-CODER-ocs/SulfurBlockLauncher/releases/download/publish-nightly/SulfurLauncher.linux.x64.rpm) |
 
 Arch 用户直接：
 
@@ -151,8 +152,9 @@ SulfurLauncher 是 **GPL-3.0-or-later** 协议开源的，代码全在 [X-CODER-
 诚实交代一下"站在谁肩膀上"——
 
 - 部分库做了**二次修改**：
-  - **MinecraftLaunch**：`Blessing-Studio/MinecraftLaunch` → `tiouoo/MinecraftLaunch`
-  - **LiteSkinViewer**：`Ktn429/LiteSkinViewer` → `tiouoo/LiteSkinViewer`
+  - **MinecraftLaunch**：`Blessing-Studio/MinecraftLaunch` 
+  - **LiteSkinViewer**：`Ktn429/LiteSkinViewer` 
+  - **Portal** : `tiouoo\Portal`
 - 设计与功能上受这些项目启发：BedrockBoot、LauncherX、Axolotl、PCL-CE、Polymerium、HMCL、BakaXL、Bedrock on Linux、portal，以及皮肤库参考的 BlockHelm-Launcher。
 
 做开源最爽的不是"我写了多少"，是**踩在这么一大堆优秀项目上，把它们揉成自己想要的样子**。感谢所有维护者和贡献者，把 Minecraft 启动器生态喂得这么肥 awa。
@@ -165,7 +167,7 @@ SulfurLauncher 是 **GPL-3.0-or-later** 协议开源的，代码全在 [X-CODER-
 
 官网已经上线，欢迎来玩、来提 issue、来提 PR：
 
-👉 [https://x-coder-ocs.github.io/SulfurBlockLauncher/](https://x-coder-ocs.github.io/SulfurBlockLauncher/)
+👉 <https://x-coder-ocs.github.io/SulfurBlockLauncher/>  
 👉 [GitHub 仓库](https://github.com/X-CODER-ocs/SulfurBlockLauncher)
 
 （广？！广？！）
