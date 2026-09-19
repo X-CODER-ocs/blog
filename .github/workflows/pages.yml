@@ -114,26 +114,16 @@ jobs:
           echo "content.json 来源校验:"; ls -l public/api/content.json
           echo "404.html 兜底:"; ls -l public/404.html
 
-      # 搜索引擎收录推送：必应（BING_TOKEN）+ Google（google-key.json）
+      # 搜索引擎收录推送：必应（BING_TOKEN）
+      # ⚠️ Google 已关闭（Indexing API 不支持普通网页），改由 sitemap.xml 自动收录，故不再写 google-key.json。
       # secrets 注入 env，shell 内判空（详见上方说明）。
-      - name: Write Google Indexing key
-        env:
-          GOOGLE_KEY_JSON: ${{ secrets.GOOGLE_KEY_JSON }}
-        run: |
-          if [ -n "$GOOGLE_KEY_JSON" ]; then
-            echo "$GOOGLE_KEY_JSON" > google-key.json
-            echo "已写入 google-key.json（插件 google_submitter 用 require 读此文件）"
-          else
-            echo "GOOGLE_KEY_JSON 未配置，跳过写入"
-          fi
-
       - name: Submit URLs to search engines
         continue-on-error: true
         env:
           BING_TOKEN: ${{ secrets.BING_TOKEN }}
         run: |
-          if [ -z "$BING_TOKEN" ] && [ ! -f google-key.json ]; then
-            echo "必应 / Google 密钥均未配置，跳过推送"
+          if [ -z "$BING_TOKEN" ]; then
+            echo "必应密钥未配置，跳过推送"
             exit 0
           fi
           # ⚠️ 必须 --skip-generate：否则 hexo deploy 会先重跑 hexo generate，
