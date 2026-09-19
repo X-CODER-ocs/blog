@@ -70,6 +70,11 @@ jobs:
           echo "boot script -> _framework/$HASHED"
           grep -n 'blazor.webassembly' .fn-dist/wwwroot/index.html
 
+      # 删除 Blazor 运行时 js 里的 sourceMappingURL 引用：Release 不发布 .map 文件，
+      # DevTools 开启时会请求 dotnet.runtime.js.map 等而 404（无害但不干净）。删掉注释行即可消除。
+      - name: Strip Blazor source map references
+        run: find .fn-dist/wwwroot/_framework -name '*.js' -exec sed -i '/sourceMappingURL=/d' {} +
+
       # 评论系统已切换为 Utterances（基于 GitHub Issues），无需任何 client secret，
       # 仅需仓库 X-CODER-ocs/blog 已安装 utterances GitHub App 且 Issues 开启。
       # 因此此处不再注入 Gitalk 密钥。
