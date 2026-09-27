@@ -82,11 +82,10 @@ jobs:
           echo "boot script -> _framework/$HASHED"
           grep -n 'blazor.webassembly' .fn-dist/wwwroot/index.html
 
-      # 删除 Blazor 运行时 js 的 sourceMappingURL 注释：Release 不发布 .map，DevTools 开启时会 404（无害）。
-      - name: Strip Blazor source map references
-        run: find .fn-dist/wwwroot/_framework -name '*.js' -exec sed -i '/sourceMappingURL=/d' {} +
-
       # 把前端发布产物并入 public/（不含 --delete，保留后端产出的 api/ 与 feed 文件）
+      # ⚠️ 注意：绝不能用 sed 改写 _framework/*.js —— .NET 10 在 HTML 里给运行时脚本写了
+      # SRI integrity 哈希，改动 .js 字节会让哈希失配、浏览器直接拦截运行时、整站打不开。
+      # Release 不发布 .map，DevTools 开时偶有 .map 404 属无害噪音，不处理。
       - name: Copy FluentNext 前端到 public/
         shell: bash
         run: |
