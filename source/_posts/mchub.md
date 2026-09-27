@@ -24,8 +24,6 @@ description: 'MChub —— SulfurLauncher 的升级形态，一个开源、跨�
 
 ![MChub](images/mchub-header.png)
 
-> 注：上面这张 header 图我偷懒没单独放，线上若 404 就当它不存在awa（下面有真下载链接，不耽误事）。
-
 ## 它是怎么来的
 
 简单交代一下来龙去脉，免得跟旧文对不上 ——
