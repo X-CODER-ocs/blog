@@ -91,7 +91,9 @@ jobs:
         shell: bash
         run: |
           set -e
-          rsync -a .fn-dist/wwwroot/ public/
+          # ⚠️ 排除 /api：前端仓库可能提交了仅供本地开发的占位 content.json，
+          #    绝不能覆盖后端生成器写出的真 content.json。
+          rsync -a --exclude='/api' .fn-dist/wwwroot/ public/
           # GitHub Pages Actions 部署不经 Jekyll，加 .nojekyll 防止 _framework/_content 被忽略
           : > public/.nojekyll
           # SPA 深链兜底：未知路径回退到 Blazor 入口，由客户端路由接管
