@@ -1,4 +1,9 @@
-name: Deploy Hexo to GitHub Pages
+name: Deploy FluentNext to GitHub Pages
+
+# 架构：.NET 后端生成器(独立仓库 fluentnext-backend) 产内容数据，
+#       Blazor WASM 前端(独立仓库 fluentnext-frontend) 负责界面。
+#       本仓库(blog)只放 Markdown 文章(source/_posts) + 图片(source/images) + 验证文件。
+#       不再使用 Hexo / Node。
 
 on:
   push:
@@ -18,47 +23,54 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # 本仓库：文章 / 图片 / 搜索引擎验证文件
       - name: Checkout blog
         uses: actions/checkout@v4
 
-      # FluentNext 前端（Blazor WASM）独立仓库：拉到 fluentnext-src/ 构建。
-      # 公开仓库，actions/checkout 匿名克隆即可，无需额外 token。
+      # 前端（Blazor WASM）独立仓库
       - name: Checkout FluentNext 前端
         uses: actions/checkout@v4
         with:
           repository: X-CODER-ocs/fluentnext-frontend
           path: fluentnext-src
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      # 后端生成器（.NET 控制台）独立仓库
+      - name: Checkout FluentNext 后端
+        uses: actions/checkout@v4
         with:
-          node-version: '22'
-          cache: npm
+          repository: X-CODER-ocs/fluentnext-backend
+          path: fluentnext-backend
 
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
 
-      - name: Install npm dependencies
-        run: npm ci
+      # ── 后端：读 Markdown → 产 content.json / atom.xml / sitemap.xml / search.xml + 拷 images ──
+      - name: Run backend generator (content.json 等)
+        run: |
+          set -e
+          dotnet run -c Release --project fluentnext-backend -- \
+            --input source/_posts \
+            --images source/images \
+            --site fluentnext-backend/site.json \
+            --output public
+          echo "后端产物:"; ls -la public
+          echo "content.json 文章数:"; grep -o '"slug"' public/api/content.json | wc -l
 
-      # 构建 Blazor 前端 → .fn-dist/wwwroot（含 _framework / _content / appsettings.json / index.html）
-      # ⚠️ 前端仓库的 .csproj 在仓库根（无外层 FluentNext.Frontend/ 子目录），须显式指向根 .csproj
+      # ── 前端：构建 Blazor WASM → .fn-dist/wwwroot ──
       - name: Build FluentNext 前端 (dotnet publish)
         run: dotnet publish fluentnext-src/FluentNext.Frontend.csproj -c Release -o .fn-dist
 
-      # GitHub Pages 子路径是 /blog/，必须把 <base href="/"> 改成 /blog/，
-      # 否则 _framework / _content / appsettings.json 等相对资源会 404。
+      # GitHub Pages 子路径 /blog/：<base href="/"> → /blog/
       - name: Rewrite base href to /blog/
         run: |
           sed -i 's#<base href="/" />#<base href="/blog/" />#' .fn-dist/wwwroot/index.html
           echo "base href -> $(grep -o '<base href="[^"]*"' .fn-dist/wwwroot/index.html)"
 
-      # ⚠️ .NET 10 发布把 blazor.webassembly.js 指纹化为哈希文件名，并只在 importmap 里映射。
-      # 但 index.html 里的经典 <script src="_framework/blazor.webassembly.js"> 标签不受 importmap 管辖，
-      # 会去请求根本不存在的无哈希文件 → 404 → Blazor 永远起不来（表现为开屏动画一直转 / 某 JS 打不开）。
-      # 这里把 script 的 src 改写指向发布时的真实哈希文件。
+      # ⚠️ .NET 发布把 blazor.webassembly.js 指纹化为哈希文件名。index.html 里的经典
+      # <script src="_framework/blazor.webassembly.js"> 不受 importmap 管辖，会请求不存在的无哈希文件 → 404。
+      # 改写指向真实哈希文件。
       - name: Fix Blazor boot script fingerprint
         run: |
           HASHED=$(ls .fn-dist/wwwroot/_framework/blazor.webassembly.*.js 2>/dev/null | head -1 | xargs -n1 basename)
@@ -70,73 +82,36 @@ jobs:
           echo "boot script -> _framework/$HASHED"
           grep -n 'blazor.webassembly' .fn-dist/wwwroot/index.html
 
-      # 删除 Blazor 运行时 js 里的 sourceMappingURL 引用：Release 不发布 .map 文件，
-      # DevTools 开启时会请求 dotnet.runtime.js.map 等而 404（无害但不干净）。删掉注释行即可消除。
+      # 删除 Blazor 运行时 js 的 sourceMappingURL 注释：Release 不发布 .map，DevTools 开启时会 404（无害）。
       - name: Strip Blazor source map references
         run: find .fn-dist/wwwroot/_framework -name '*.js' -exec sed -i '/sourceMappingURL=/d' {} +
 
-      # 评论系统已切换为 Utterances（基于 GitHub Issues），无需任何 client secret，
-      # 仅需仓库 X-CODER-ocs/blog 已安装 utterances GitHub App 且 Issues 开启。
-      # 因此此处不再注入 Gitalk 密钥。
-      - name: Comments provider check
-        run: echo "评论：Utterances（无需密钥注入）"
-
-      - name: Clean Hexo
-        run: npx hexo clean
-
-      # 生成「真 Hexo 后端」：scripts/fluentnext-content.js 输出 public/api/content.json
-      - name: Build Hexo (content.json 后端)
-        run: npx hexo generate
-
-      # 把 Blazor 发布产物拷进 public/，覆盖 NexT 生成的 index.html，
-      # 但排除 api/（保留 Hexo 生成的真 content.json），并保留搜索引擎验证文件。
+      # 把前端发布产物并入 public/（不含 --delete，保留后端产出的 api/ 与 feed 文件）
       - name: Copy FluentNext 前端到 public/
         shell: bash
         run: |
           set -e
-          shopt -s nullglob
-          # 清理 Hexo 主题渲染出的「幽灵」静态页（文章 / 分类 / 标签 / 归档 / 关于 / 分页），
-          # 真正的页面由 Blazor SPA 客户端路由呈现。保留：
-          #   api/            —— 真 Hexo 后端 content.json（rsync 用 --exclude 保护）
-          #   atom.xml 等     —— feed / sitemap / search 等生成器产物
-          #   根目录验证文件   —— BingSiteAuth.xml / google*.html / baidu_verify_*.html
-          rm -rf public/20[0-9][0-9] public/categories public/tags public/archives public/about public/page 2>/dev/null || true
-          rsync -a --exclude='/api' .fn-dist/wwwroot/ public/
-          # 兜底：GitHub Pages Actions 部署不经 Jekyll，加 .nojekyll 防止 _framework/_content 被忽略
+          rsync -a .fn-dist/wwwroot/ public/
+          # GitHub Pages Actions 部署不经 Jekyll，加 .nojekyll 防止 _framework/_content 被忽略
           : > public/.nojekyll
-          # SPA 深链兜底：GitHub Pages 无服务端回退。把 SPA 入口复制为 404.html，
-          # 任意未知路径（如硬刷新 /blog/post/xxx）都回退到 Blazor 入口，由客户端路由接管。
+          # SPA 深链兜底：未知路径回退到 Blazor 入口，由客户端路由接管
           cp public/index.html public/404.html
-          # 旧 NexT 的带日期 / 绝对路径外链（如 /post/xxx、/2026/09/05/xxx）缺失 /blog/ 前缀会 404。
-          # 在 404 兜底页顶部注入重定向：把这类路径补回 /blog/ 前缀，交还 SPA 客户端路由接管。
           REDIRECT='<script>try{if(location.pathname.charAt(0)==="/"&&!location.pathname.startsWith("/blog/")){location.replace("/blog"+location.pathname+location.search+location.hash);}}catch(e){}<\/script>'
           sed -i "s#<head>#<head>$REDIRECT#" public/404.html
-          echo "404.html 重定向注入条数:"; grep -c 'location.pathname.startsWith' public/404.html
-          # 清掉旧 NexT 主题的 PWA 残留：service-worker.js / workbox-*.js 会劫持浏览器缓存，
-          # 让已注册旧 SW 的浏览器用过期资源喂 Blazor，导致 JS 加载失败。删除后旧 SW 在下次导航自检 404 时自动注销。
-          rm -f public/service-worker.js public/workbox-*.js
-          echo "public 顶层:"; ls public
-          echo "content.json 来源校验:"; ls -l public/api/content.json
-          echo "404.html 兜底:"; ls -l public/404.html
+          echo "404.html 兜底注入条数:"; grep -c 'location.pathname.startsWith' public/404.html
 
-      # 搜索引擎收录推送：必应（BING_TOKEN）
-      # ⚠️ Google 已关闭（Indexing API 不支持普通网页），改由 sitemap.xml 自动收录，故不再写 google-key.json。
-      # secrets 注入 env，shell 内判空（详见上方说明）。
-      - name: Submit URLs to search engines
-        continue-on-error: true
-        env:
-          BING_TOKEN: ${{ secrets.BING_TOKEN }}
+      # 拷贝搜索引擎站点验证文件（来源：本仓库 source/ 根目录，官方要求永久保留）
+      - name: Copy search engine auth files
+        shell: bash
         run: |
-          if [ -z "$BING_TOKEN" ]; then
-            echo "必应密钥未配置，跳过推送"
-            exit 0
-          fi
-          # ⚠️ 必须 --skip-generate：否则 hexo deploy 会先重跑 hexo generate，
-          # 把旧 NexT PWA 插件生成的 service-worker.js / workbox 重新写回 public/，
-          # 覆盖上面删掉的残留，并复活被清理的「幽灵」静态页。
-          npx hexo deploy --skip-generate
+          set -e
+          shopt -s nullglob
+          for f in source/BingSiteAuth.xml source/google*.html source/baidu_verify_*.html; do
+            cp "$f" public/ 2>/dev/null || true
+          done
+          ls public | grep -iE 'BingSiteAuth|google|baidu' || echo "(无验证文件，跳过)"
 
-      # 搜索引擎站点验证文件守卫：官方要求永久保留在站点根，被删/被渲染则阻断部署。
+      # 守卫：验证文件缺失或被渲染(>1000字节)则阻断部署
       - name: Guard search engine auth files
         shell: bash
         run: |
@@ -150,18 +125,11 @@ jobs:
             fi
             size=$(wc -c < "$f")
             if [ "$size" -gt 1000 ]; then
-              echo "::error::$(basename "$f") 大小 ${size} 字节，疑似被渲染，检查 _config.yml 的 skip_render"
+              echo "::error::$(basename "$f") 大小 ${size} 字节，疑似被渲染，检查来源"
               exit 1
             fi
             echo "OK: $(basename "$f") (${size} 字节，纯文本)"
           done
-
-      # 兜底清理：若上方任何步骤仍把旧 NexT PWA 残留写回 public/，上传前彻底删除，
-      # 避免 service worker 劫持 Blazor 资源缓存、导致 JS 加载失败。
-      - name: Remove legacy PWA leftovers before upload
-        run: |
-          rm -f public/service-worker.js public/workbox-*.js public/service-worker.js.map public/workbox-*.js.map
-          echo "PWA 残留清理后 public 顶层:"; ls public
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
