@@ -9,3 +9,4 @@ public/
 *.code-workspace
 .workbuddy/
 google-key.json
+source/_posts/fluentnext-backend-rewrite.md
