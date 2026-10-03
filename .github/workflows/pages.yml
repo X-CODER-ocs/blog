@@ -31,14 +31,14 @@ jobs:
       - name: Checkout FluentNext 前端
         uses: actions/checkout@v4
         with:
-          repository: X-CODER-ocs/fluentnext-frontend
+          repository: XLord-Heliukum/fluentnext-frontend
           path: fluentnext-src
 
       # 后端生成器（.NET 控制台）独立仓库
       - name: Checkout FluentNext 后端
         uses: actions/checkout@v4
         with:
-          repository: X-CODER-ocs/fluentnext-backend
+          repository: XLord-Heliukum/fluentnext-backend
           path: fluentnext-backend
 
       - name: Setup .NET 10
